@@ -1,4 +1,4 @@
-name: Deploy Node.js to Azure App Service (Windows)
+name: Deploy Node.js to Azure App Service (Linux)
 
 on:
   push:
@@ -9,25 +9,34 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     concurrency:
-      group: appservice-telegram
+      group: appservice-telegram-linux
+      cancel-in-progress: true
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node
+        uses: actions/setup-node@v4
         with:
-          node-version: '20'   # o 22 si tu app lo requiere
+          node-version: '20'  # En Linux puedes usar '22' si tu app lo requiere
 
-      # opcional: sanity check de instalación
-      - name: Install deps
+      # (Opcional) Valida que el repo instala, pero NO subiremos node_modules
+      - name: Install deps (optional)
         run: |
-          if [ -f package-lock.json ]; then npm ci; else npm i; fi
+          if [ -f package-lock.json ]; then
+            npm ci --ignore-scripts
+          else
+            npm i --ignore-scripts
+          fi
 
-      # empaqueta (evita subir .git y node_modules)
+      # Importante: NO incluir node_modules en el paquete
       - name: Create deployment package
         run: zip -r release.zip . -x ".git/*" ".github/*" "node_modules/*"
 
-      - name: Deploy to Azure Web App
+      - name: Deploy to Azure Web App (Linux)
         uses: azure/webapps-deploy@v3
         with:
-          app-name: "telegram"                                  # <- NOMBRE DEL RECURSO
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
+          app-name: "<TU_APP_LINUX>"                         # <-- pon el nombre exacto
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_LINUX }}
           package: "release.zip"
