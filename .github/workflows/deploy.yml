@@ -38,5 +38,5 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: "<TU_APP_LINUX>"                         # <-- pon el nombre exacto
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_LINUX }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE}}
           package: "release.zip"
