@@ -2,7 +2,7 @@ name: Deploy Node.js to Azure App Service (Windows)
 
 on:
   push:
-    branches: [ "main" ]   # Cambia si despliegas desde otra rama
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
@@ -13,31 +13,23 @@ jobs:
       cancel-in-progress: true
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      # (Opcional) valida que el proyecto instala bien en CI
-      - name: Use Node 22
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '22'
 
-      - name: Install deps (optional sanity check)
+      # opcional: sanity check
+      - name: Install deps
         run: |
-          if [ -f package-lock.json ]; then
-            npm ci
-          else
-            npm install
-          fi
+          if [ -f package-lock.json ]; then npm ci; else npm i; fi
 
-      # Empaquetamos el código para que Kudu haga npm install en Azure (Windows)
       - name: Create deployment package
-        run: |
-          zip -r release.zip . -x ".git/*" ".github/*" "node_modules/*"
+        run: zip -r release.zip . -x ".git/*" ".github/*" "node_modules/*"
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: "telegram-eea9eqgse0dcg8ch"                  # <- nombre exacto de tu Web App
+          app-name: "telegram-eea9eqgse0dcg8ch"
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
           package: "release.zip"
