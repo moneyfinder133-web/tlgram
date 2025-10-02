@@ -37,6 +37,6 @@ jobs:
       - name: Deploy to Azure Web App (Linux)
         uses: azure/webapps-deploy@v3
         with:
-          app-name: "<TU_APP_LINUX>"                         # <-- pon el nombre exacto
+          app-name: telegram                        # <-- pon el nombre exacto
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE}}
           package: "release.zip"
