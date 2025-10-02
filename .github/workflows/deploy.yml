@@ -9,27 +9,25 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     concurrency:
-      group: appservice-telegram-eea9eqgse0dcg8ch
-      cancel-in-progress: true
-
+      group: appservice-telegram
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '22'   # o 22 si tu app lo requiere
 
-      # opcional: sanity check
+      # opcional: sanity check de instalación
       - name: Install deps
         run: |
           if [ -f package-lock.json ]; then npm ci; else npm i; fi
 
+      # empaqueta (evita subir .git y node_modules)
       - name: Create deployment package
         run: zip -r release.zip . -x ".git/*" ".github/*" "node_modules/*"
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: "telegram-eea9eqgse0dcg8ch"
+          app-name: "telegram"                                  # <- NOMBRE DEL RECURSO
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
           package: "release.zip"
